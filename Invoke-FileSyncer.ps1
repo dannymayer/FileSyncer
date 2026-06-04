@@ -210,19 +210,23 @@ function Resolve-FileName {
     $baseName  = [System.IO.Path]::GetFileNameWithoutExtension($OriginalName)
     $extension = [System.IO.Path]::GetExtension($OriginalName)
 
-    if ($RenameRule.newName) { $baseName = $RenameRule.newName }
-
-    $position = if ($RenameRule.timestampPosition) { $RenameRule.timestampPosition } else { 'suffix' }
-    $format   = if ($RenameRule.timestampFormat)   { $RenameRule.timestampFormat }   else { 'yyyyMMdd_HHmmss' }
+    # Use Get-ConfigProperty for every rename rule field — all are optional, and
+    # Set-StrictMode -Version Latest throws if a PSCustomObject property is missing.
+    $newName  = Get-ConfigProperty -Config $RenameRule -Name 'newName'
+    $prefix   = Get-ConfigProperty -Config $RenameRule -Name 'prefix'
+    $suffix   = Get-ConfigProperty -Config $RenameRule -Name 'suffix'
+    $position = Get-ConfigProperty -Config $RenameRule -Name 'timestampPosition' -Default 'suffix'
+    $format   = Get-ConfigProperty -Config $RenameRule -Name 'timestampFormat'   -Default 'yyyyMMdd_HHmmss'
     $stamp    = ''
 
-    if ($RenameRule.addTimestamp) { $stamp = Get-Date -Format $format }
+    if ($newName)  { $baseName = $newName }
+    if (Get-ConfigProperty -Config $RenameRule -Name 'addTimestamp') { $stamp = Get-Date -Format $format }
 
     $result = ''
     if ($stamp -and $position -eq 'prefix') { $result += "${stamp}_" }
-    if ($RenameRule.prefix) { $result += $RenameRule.prefix }
+    if ($prefix) { $result += $prefix }
     $result += $baseName
-    if ($RenameRule.suffix) { $result += $RenameRule.suffix }
+    if ($suffix) { $result += $suffix }
     if ($stamp -and $position -eq 'suffix') { $result += "_$stamp" }
     $result += $extension
 
