@@ -337,7 +337,23 @@ if (-not (Test-Path -Path $ConfigPath)) {
     )
 }
 
-$config = Get-Content -Path $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
+try {
+    $config = Get-Content -Path $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
+} catch {
+    $PSCmdlet.ThrowTerminatingError(
+        [System.Management.Automation.ErrorRecord]::new(
+            [System.FormatException]::new(
+                "Failed to parse '$ConfigPath': $_`n" +
+                "In JSON, every backslash in a path must be doubled.`n" +
+                "  Local path:  C:\Logs\File  ->  `"C:\\\\Logs\\\\File`"`n" +
+                "  UNC path:    \\\\server\share  ->  `"\\\\\\\\server\\\\share`""
+            ),
+            'ConfigParseError',
+            [System.Management.Automation.ErrorCategory]::InvalidData,
+            $ConfigPath
+        )
+    )
+}
 
 $script:LogPath  = Get-ConfigProperty -Config $config -Name 'logPath'
 $script:LogLevel = Get-ConfigProperty -Config $config -Name 'logLevel'  -Default 'Info'

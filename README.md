@@ -210,6 +210,29 @@ When the log file exceeds `maxLogSizeMB`, it is renamed with a timestamp (e.g. `
 
 ---
 
+## Troubleshooting
+
+### `Conversion from JSON failed with error: Invalid Unicode escape sequence`
+
+JSON treats `\` as an escape character, so every backslash in a path string must be written as `\\`. Forgetting this is the most common config mistake.
+
+| Path type | Actual path | Correct JSON value |
+| --- | --- | --- |
+| Local | `C:\Logs\FileSyncer` | `"C:\\Logs\\FileSyncer"` |
+| Local | `C:\Reports\Incoming` | `"C:\\Reports\\Incoming"` |
+| UNC | `\\server\share` | `"\\\\server\\share"` |
+| UNC | `\\fileserver\Shared\Reports` | `"\\\\fileserver\\Shared\\Reports"` |
+
+A quick way to validate your config before running the script:
+
+```powershell
+Get-Content .\config.json | ConvertFrom-Json
+```
+
+If that command succeeds without error, the JSON is valid.
+
+---
+
 ## Requirements
 
 - Windows PowerShell 5.1 or later
