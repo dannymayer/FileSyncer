@@ -1,0 +1,49 @@
+{
+  "logPath": "C:\\Logs\\FileSyncer\\FileSyncer.log",
+  "statePath": "C:\\Logs\\FileSyncer\\state.json",
+  "logLevel": "Info",
+  "maxLogSizeMB": 10,
+  "watchRules": [
+    {
+      "name": "Daily Sales Report",
+      "enabled": true,
+      "sourceFolder": "C:\\Reports\\Incoming",
+      "filePattern": "SalesReport_*.xlsx",
+      "action": "copy",
+      "onlyNew": true,
+      "destinations": [
+        {
+          "path": "C:\\Reports\\Archive",
+          "rename": {
+            "addTimestamp": true,
+            "timestampFormat": "yyyyMMdd",
+            "timestampPosition": "suffix"
+          }
+        },
+        {
+          "path": "\\\\fileserver\\Shared\\Reports",
+          "rename": null
+        }
+      ]
+    },
+    {
+      "name": "Move Processed Invoices",
+      "enabled": false,
+      "sourceFolder": "C:\\Invoices\\Drop",
+      "filePattern": "INV_*.pdf",
+      "action": "move",
+      "onlyNew": true,
+      "destinations": [
+        {
+          "path": "C:\\Invoices\\Processed",
+          "rename": {
+            "prefix": "DONE_",
+            "addTimestamp": true,
+            "timestampFormat": "yyyyMMdd_HHmmss",
+            "timestampPosition": "suffix"
+          }
+        }
+      ]
+    }
+  ]
+}
