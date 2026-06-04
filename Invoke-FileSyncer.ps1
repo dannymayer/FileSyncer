@@ -345,8 +345,8 @@ try {
             [System.FormatException]::new(
                 "Failed to parse '$ConfigPath': $_`n" +
                 "In JSON, every backslash in a path must be doubled.`n" +
-                "  Local path:  C:\Logs\File  ->  `"C:\\\\Logs\\\\File`"`n" +
-                "  UNC path:    \\\\server\share  ->  `"\\\\\\\\server\\\\share`""
+                "  Local path:  C:\Logs\File  ->  `"C:\\Logs\\File`"`n" +
+                "  UNC path:    \\server\share  ->  `"\\\\server\\share`""
             ),
             'ConfigParseError',
             [System.Management.Automation.ErrorCategory]::InvalidData,
